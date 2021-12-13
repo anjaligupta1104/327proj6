@@ -28,7 +28,7 @@ class SantoriniCLI:
         else:
             self._score = True
     
-    def run(self):
+    def run(self, caretaker):
         while True:
             # display
             self._board.display()
@@ -46,8 +46,24 @@ class SantoriniCLI:
 
             print("\n")
 
+            # undo, redo, or next
+            if self._redo:
+                # TODO: implement undo/redo functionality
+                undo_redo = input("undo, redo, or next\n")
+                if undo_redo == "undo":
+                    # undo
+                    caretaker.undo()
+                    continue
+                else if undo_redo == "redo":
+                    # redo
+                    caretaker.redo()
+                    continue
+
             # move
             self._currPlayer.move()
+
+            # save the board after every move
+            caretaker.backup()
 
             # check if game ended
             if self._board.game_ended():
@@ -58,6 +74,20 @@ class SantoriniCLI:
                 self._currPlayer = self._player2
             else:
                 self._currPlayer = self._player1
+
+    def save(self) -> Memento:
+        """
+        Saves the current state inside a memento.
+        """
+
+        return Memento(self._state)
+
+    def restore(self, memento: Memento) -> None:
+        """
+        Restores the Originator's state from a memento object.
+        """
+        # TODO: change restore function
+        self._state = memento.get_state()
             
             
             
