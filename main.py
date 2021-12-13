@@ -5,6 +5,7 @@ CPSC 327 Pset 6
 
 import sys
 from SantoriniCLI import SantoriniCLI
+from memento import Caretaker
 
 """
 Take in the command line args, then use them to set up a manager object that will drive the core game loop.
