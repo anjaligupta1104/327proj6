@@ -49,7 +49,6 @@ class SantoriniCLI:
 
             # undo, redo, or next
             if self._redo:
-                # TODO: implement undo/redo functionality
                 undo_redo = input("undo, redo, or next\n")
                 if undo_redo == "undo":
                     # undo
@@ -59,6 +58,8 @@ class SantoriniCLI:
                     # redo
                     caretaker.redo()
                     continue
+                else if undo_redo == "next":
+                    caretaker.wipe()
 
             # move
             self._currPlayer.move()
@@ -82,15 +83,14 @@ class SantoriniCLI:
         """
         Saves the current state inside a memento.
         """
-
-        return Memento(self._state)
+        state = (self._board, self._player1, self._player2, self._currPlayer, self._otherPlayer, self._turn)
+        return Memento(state)
 
     def restore(self, memento: Memento) -> None:
         """
         Restores the Originator's state from a memento object.
         """
-        # TODO: change restore function
-        self._state = memento.get_state()
+        (self._board, self._player1, self._player2, self._currPlayer, self._otherPlayer, self._turn) = memento.get_state()
             
             
         
