@@ -7,6 +7,7 @@ Saturday, 3:30 pm
 import sys
 from board import Board
 from player import playerFactory
+from memento import Memento
 
 class SantoriniCLI:
     """Display board and options"""
@@ -54,11 +55,11 @@ class SantoriniCLI:
                     # undo
                     caretaker.undo()
                     continue
-                else if undo_redo == "redo":
+                elif undo_redo == "redo":
                     # redo
                     caretaker.redo()
                     continue
-                else if undo_redo == "next":
+                elif undo_redo == "next":
                     caretaker.wipe()
 
             # move
@@ -79,14 +80,14 @@ class SantoriniCLI:
                 self._currPlayer = self._player1
                 self._otherPlayer = self._player2
 
-    def save(self) -> Memento:
+    def save(self):
         """
         Saves the current state inside a memento.
         """
         state = (self._board, self._player1, self._player2, self._currPlayer, self._otherPlayer, self._turn)
         return Memento(state)
 
-    def restore(self, memento: Memento) -> None:
+    def restore(self, memento):
         """
         Restores the Originator's state from a memento object.
         """
