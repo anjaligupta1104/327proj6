@@ -9,6 +9,8 @@ class Board:
     def __init__(self):
         self.buildings = [[0 for col in range(5)] for row in range(5)]
         self._workers = [[0 for col in range(5)] for row in range(5)]
+
+        # initialize workers
         self._workers[1][1] = 'Y'
         self._workers[1][3] = 'B'
         self._workers[3][1] = 'A'

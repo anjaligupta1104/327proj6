@@ -16,6 +16,7 @@ class SantoriniCLI:
         self._player1 = playerFactory.build_player(arg1, 1)
         self._player2 = playerFactory.build_player(arg2, 2)
         self._currPlayer = self._player1
+        self._otherPlayer = self._player2
         self._turn = 1
 
         if arg3 == "off":
@@ -72,8 +73,10 @@ class SantoriniCLI:
             # switch players
             if self._turn % 2 == 1:
                 self._currPlayer = self._player2
+                self._otherPlayer = self._player1
             else:
                 self._currPlayer = self._player1
+<<<<<<< HEAD
 
     def save(self) -> Memento:
         """
@@ -88,6 +91,9 @@ class SantoriniCLI:
         """
         # TODO: change restore function
         self._state = memento.get_state()
+=======
+                self._otherPlayer = self._player2
+>>>>>>> 6fcbb1a0c83921967d6d3fdcc85e0443ced408e2
             
             
             
