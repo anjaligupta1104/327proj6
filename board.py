@@ -1,29 +1,34 @@
-"""
-Meili and Anjali Gupta
-CPSC 327 Pset
-Saturday, 3:30 pm
-"""
-
 class Board:
 
     def __init__(self):
+        # initialize board
         self.buildings = [[0 for col in range(5)] for row in range(5)]
-        self._workers = [[0 for col in range(5)] for row in range(5)]
+        self.workers = [[0 for col in range(5)] for row in range(5)]
 
         # initialize workers
-        self._workers[1][1] = 'Y'
-        self._workers[1][3] = 'B'
-        self._workers[3][1] = 'A'
-        self._workers[3][3] = 'Z'
+        self.workers[1][1] = 'Y'
+        self.workers[1][3] = 'B'
+        self.workers[3][1] = 'A'
+        self.workers[3][3] = 'Z'
+
+        # initialize players
+        self.player1 = None
+        self.player2 = None
+
+    def set_player(self, player):
+        if player.player_num == 1:
+            self.player1 = player
+        else:
+            self.player2 = player
 
     def display(self):
         for i in range(5):
             print("+--+--+--+--+--+\n")
             for j in range(5):
                 print("|")
-                print(self._buildings[i][j])
-                if self._workers[i][j] != 0:
-                    print(self._workers[i][j])
+                print(self.buildings[i][j])
+                if self.workers[i][j] != 0:
+                    print(self.workers[i][j])
                 else:
                     print(" ")
             print("|\n")
@@ -31,8 +36,8 @@ class Board:
     def game_ended(self):
         for i in range(5):
             for j in range(5):
-                if self._buildings[i][j] == 3 and self._workers[i][j] != 0:
-                    if self._workers[i][j] == 'A' or self._workers[i][j] == 'B':
+                if self.buildings[i][j] == 3 and self.workers[i][j] != 0:
+                    if self.workers[i][j] == 'A' or self.workers[i][j] == 'B':
                         playerLabel = "white"
                     else:
                         playerLabel = "blue"
@@ -41,3 +46,4 @@ class Board:
                     return True
 
         return False
+        
