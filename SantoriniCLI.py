@@ -75,14 +75,14 @@ class SantoriniCLI:
         """
         Saves the current state inside a memento.
         """
-        state = (self._board, self._currPlayer, self._otherPlayer, self._turn)
+        state = (self.board, self._currPlayer, self._otherPlayer, self._turn)
         return Memento(state)
 
     def restore(self, memento):
         """
         Restores the Originator's state from a memento object.
         """
-        (self._board, self._currPlayer, self._otherPlayer, self._turn) = memento.get_state()
+        (self.board, self._currPlayer, self._otherPlayer, self._turn) = memento.get_state()
             
             
         

@@ -2,11 +2,7 @@
 Meili and Anjali Gupta
 CPSC 327 Pset
 Monday, 12:42am
-"""
 
-from SantoriniCLI import SantoriniCLI
-
-"""
 SantoriniCLI is the originator.
 Created classes Memento and Caretaker.
 """
@@ -28,7 +24,7 @@ class Caretaker():
     works with all mementos via the base Memento interface.
     """
 
-    def __init__(self, originator: Originator) -> None:
+    def __init__(self, originator) -> None:
         self._mementos = []
         self._originator = originator
         self._pointer = 0
