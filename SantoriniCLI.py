@@ -17,7 +17,7 @@ class SantoriniCLI:
         self._otherPlayer = player2
         self._turn = 1
         self._redo = True if arg3 == "on" else False
-        self._score = True if arg4 == "off" else False
+        self._score = True if arg4 == "on" else False
     
     def run(self, caretaker):
         while True:
@@ -30,13 +30,16 @@ class SantoriniCLI:
             else:
                 playerLabel = "blue (YZ)"
 
-            print("Turn: {0}, {0}".format(self._turn, playerLabel))
+            print("Turn: {0}, {1}".format(self._turn, playerLabel), end = '')
     
             # print score, note that this only occurs if currPlayer is heuristic
             if self._score:
-                print(", ({0}, {0}, {0})".format(self._currPlayer.height_score, self._currPlayer.center_score, self._currPlayer.distance_score))
+                (move_score, height_score, center_score, distance_score) = self._currPlayer._move_score()
+                print(", ({0}, {1}, {2})".format(height_score, center_score, distance_score))
 
-            print("\n")
+            # check if game ended
+            if self.board.game_ended():
+                sys.exit(0)
 
             # undo, redo, or next
             if self._redo:
@@ -59,10 +62,6 @@ class SantoriniCLI:
             # save the board after every move
             caretaker.backup()
 
-            # check if game ended
-            if self._board.game_ended():
-                sys.exit(0)
-
             # switch players
             if self._turn % 2 == 1:
                 self._currPlayer = self.board.player2
@@ -70,6 +69,7 @@ class SantoriniCLI:
             else:
                 self._currPlayer = self.board.player1
                 self._otherPlayer = self.board.player2
+            self._turn += 1
 
     def save(self):
         """

@@ -8,10 +8,10 @@ class NotYourWorkerError(Exception):
     pass
 class DirectionError(Exception):
     pass
-
 class NonValidDirectionError(Exception):
     def __init__(self, direction):
         self.direction = direction
+
 class playerFactory:
     def build_player(board, player_type, player_num):
         if player_type == "human":
@@ -34,33 +34,34 @@ class Player:
         pass
 
     def _enumerate_valid_moves(self):
-        moves = {}
+        moves = []
         directions = ["n", "ne", "e", "se", "s", "sw", "w", "nw"]
-        for piece_num in range(1,2):
-            self._set_temp_location(piece_num)
-            for move_num in range(9):
-                for build_num in range(9):
+        for piece_num in range(1,3):
+            for move_num in range(8):
+                for build_num in range(8):
                     move_dir = directions[move_num]
                     build_dir = directions[build_num]
-                    
+                    self._set_temp(piece_num)
+
                     if self._try_move(move_dir) and self._try_build(build_dir):
-                        move = Move(self.board, self.player_num, piece_num, self._get_dir(move_dir), self._get_dir(move_dir))
+                        move = Move(self.board, self.player_num, piece_num, move_dir, build_dir)
                         moves.append(move)
         return moves
 
-    def _set_temp_location(self, piece_num):
+    def _set_temp(self, piece_num):
         self._temp_location = self.piece1.location if piece_num == 1 else self.piece2.location
+        self._temp_workers = self.board.workers
 
     def _get_dir(self, dir):
         directions = {
-            "n": [0,1],
-            "ne": [1,1],
-            "e": [1,0],
-            "se": [1,-1],
-            "s": [0,-1],
-            "sw": [-1,-1],
-            "w": [-1,0],
-            "nw": [-1,1]
+            "n": [-1,0],
+            "ne": [-1,1],
+            "e": [0,1],
+            "se": [1,1],
+            "s": [1,0],
+            "sw": [1,-1],
+            "w": [0,-1],
+            "nw": [-1,-1]
         }
         return directions.get(dir)
 
@@ -69,91 +70,34 @@ class Player:
         new_x = self._temp_location[0] + move[0]
         new_y = self._temp_location[1] + move[1]
         in_bounds = new_x >= 0 and new_x <= 4 and new_y >= 0 and new_y <= 4
-        free = self.board.workers[new_x][new_y] == 0
-        if in_bounds and free:
-            self._temp_location = [new_x, new_y]
+
+        if in_bounds:
+            free = self.board.workers[new_x][new_y] == 0
+            height_diff = self.board.buildings[new_x][new_y] - self.board.buildings[self._temp_location[0]][self._temp_location[1]] <= 1
+
+            if free and height_diff:
+                self._temp_workers[self._temp_location[0]][self._temp_location[1]] = 0
+                self._temp_location = [new_x, new_y]
+                return True
+            else:
+                return False
         else:
-            raise NonValidDirectionError(dir)
+            return False
 
     def _try_build(self, dir):
         build = self._get_dir(dir)
         build_x = self._temp_location[0] + build[0]
         build_y = self._temp_location[1] + build[1]
         in_bounds = build_x >= 0 and build_x <= 4 and build_y >= 0 and build_y <= 4
-        if not in_bounds:
-            raise NonValidDirectionError(dir)
-class Human(Player):
-    def __init__(self, board, player_num):
-        super().__init__(board, player_num)
 
-    def choose_move(self):
-        while True:
-            try:
-                piece_letter = input("Select a worker to move\n")
+        if in_bounds:
+            height_4 = self.board.buildings[build_x][build_y] < 4
+            free = self._temp_workers[build_x][build_y] == 0
 
-                if piece_letter not in {'A','B','Y','Z'}:
-                    raise WorkerError
-                if self.player_num == 1 and piece_letter not in {'A','B'}:
-                    raise NotYourWorkerError
-                if self.player_num == 2 and piece_letter not in {'Y','Z'}:
-                    raise NotYourWorkerError
+            return height_4 and free
+        else:
+            return False
 
-                piece_num = 1 if piece_letter in {'A','Y'} else 2
-                self._set_temp_location(piece_num)
-
-            except WorkerError:
-                print("Not a valid worker")
-            except NotYourWorkerError:
-                print("That is not your worker")
-            else:
-                break
-
-        while True:
-            try:
-                move_dir = input("Select a direction to move (n, ne, e, se, s, sw, w, nw)")
-
-                if move_dir not in {"n", "ne", "e", "se", "s", "sw", "w", "nw"}:
-                    raise DirectionError
-                
-                self._try_move(move_dir)
-            except DirectionError:
-                print("Not a valid direction")
-            except NonValidDirectionError as nvd:
-                print(f"Cannot move {nvd.direction}")
-            else:
-                break
-            
-        while True:
-            try:
-                build_dir = input("Select a direction to build (n, ne, e, se, s, sw, w, nw)")
-
-                if build_dir not in {"n", "ne", "e", "se", "s", "sw", "w", "nw"}:
-                    raise DirectionError
-
-                self._try_build(build_dir)
-            except DirectionError:
-                print("Not a valid direction")
-            except NonValidDirectionError as nvd:
-                print(f"Cannot build {nvd.direction}")
-            else:
-                break
-
-        return Move(self.board, self.player_num, piece_num, self._get_dir(move_dir), self._get_dir(move_dir))
-class Random(Player):
-    def __init__(self, board, player_num):
-        super().__init__(board, player_num)
-
-    def choose_move(self):
-        moves = self._enumerate_valid_moves()
-        random_i = random.randint(0,len(moves)-1)
-        return moves[random_i]
-class Heuristic(Player):
-    def __init__(self, board, player_num):
-        self.height_score = 0
-        self.center_score = 0
-        self.distance_score = 0
-        super().__init__(board, player_num)
-    
     def _height_score(self):
         piece1_height = self.board.buildings[self.piece1.location[0]][self.piece1.location[1]]
         piece2_height = self.board.buildings[self.piece2.location[0]][self.piece2.location[1]]
@@ -184,6 +128,92 @@ class Heuristic(Player):
 
         return distance_x + distance_y
 
+    def _move_score(self):
+        height_score = self._height_score()
+        center_score = self._center_score()
+        distance_score = self._distance_score()
+        move_score = 3*height_score + 2*center_score + 1*distance_score
+        return (move_score, height_score, center_score, distance_score)
+
+
+class Human(Player):
+    def __init__(self, board, player_num):
+        super().__init__(board, player_num)
+
+    def choose_move(self):
+        while True:
+            try:
+                piece_letter = input("Select a worker to move\n")
+
+                if piece_letter not in {'A','B','Y','Z'}:
+                    raise WorkerError
+                if self.player_num == 1 and piece_letter not in {'A','B'}:
+                    raise NotYourWorkerError
+                if self.player_num == 2 and piece_letter not in {'Y','Z'}:
+                    raise NotYourWorkerError
+
+                piece_num = 1 if piece_letter in {'A','Y'} else 2
+                self._set_temp(piece_num)
+
+            except WorkerError:
+                print("Not a valid worker")
+            except NotYourWorkerError:
+                print("That is not your worker")
+            else:
+                break
+
+        while True:
+            try:
+                move_dir = input("Select a direction to move (n, ne, e, se, s, sw, w, nw)\n")
+
+                if move_dir not in {"n", "ne", "e", "se", "s", "sw", "w", "nw"}:
+                    raise DirectionError
+                if not self._try_move(move_dir):
+                    raise NonValidDirectionError(move_dir)
+
+            except DirectionError:
+                print("Not a valid direction")
+            except NonValidDirectionError as nvd:
+                print(f"Cannot move {nvd.direction}")
+            else:
+                break
+            
+        while True:
+            try:
+                build_dir = input("Select a direction to build (n, ne, e, se, s, sw, w, nw)\n")
+
+                if build_dir not in {"n", "ne", "e", "se", "s", "sw", "w", "nw"}:
+                    raise DirectionError
+
+                if not self._try_build(build_dir):
+                    raise NonValidDirectionError(build_dir)
+            except DirectionError:
+                print("Not a valid direction")
+            except NonValidDirectionError as nvd:
+                print(f"Cannot build {nvd.direction}")
+            else:
+                break
+
+        return Move(self.board, self.player_num, piece_num, move_dir, build_dir)
+
+class Random(Player):
+    def __init__(self, board, player_num):
+        super().__init__(board, player_num)
+
+    def choose_move(self):
+        moves = self._enumerate_valid_moves()
+        random_i = random.randint(0,len(moves)-1)
+        move = moves[random_i]
+        move.print_move()
+        return move
+
+class Heuristic(Player):
+    def __init__(self, board, player_num):
+        super().__init__(board, player_num)
+        self.height_score = 0
+        self.center_score = 0
+        self.distance_score = 0
+
     def choose_move(self):
         moves = self._enumerate_valid_moves()
 
@@ -194,17 +224,14 @@ class Heuristic(Player):
         for move in moves:
             move.execute()
 
-            height_score = self._height_score()
-            center_score = self._center_score()
-            distance_score = self._distance_score()
-            move_score = 3*height_score + 2*center_score + 1*distance_score
+            (move_score, height_score, center_score, distance_score) = self._move_score()
             
             if move_score > max_move_score:
                 max_move = move
                 self.height_score = height_score
                 self.center_score = center_score
                 self.distance_score = distance_score
-
+                
             move.undo()
 
         return max_move

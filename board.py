@@ -23,15 +23,16 @@ class Board:
 
     def display(self):
         for i in range(5):
-            print("+--+--+--+--+--+\n")
+            print("+--+--+--+--+--+")
             for j in range(5):
-                print("|")
-                print(self.buildings[i][j])
+                print("|", end = '')
+                print(self.buildings[i][j], end = '')
                 if self.workers[i][j] != 0:
-                    print(self.workers[i][j])
+                    print(self.workers[i][j], end = '')
                 else:
-                    print(" ")
-            print("|\n")
+                    print(" ", end = '')
+            print("|")
+        print("+--+--+--+--+--+")
 
     def game_ended(self):
         for i in range(5):
@@ -42,7 +43,7 @@ class Board:
                     else:
                         playerLabel = "blue"
 
-                    print(playerLabel + "has won")
+                    print(playerLabel + " has won")
                     return True
 
         return False
