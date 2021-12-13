@@ -11,4 +11,7 @@ Take in the command line args, then use them to set up a manager object that wil
 """
 
 if __name__ == "__main__":
-    SantoriniCLI(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]).run()
+    santorini = SantoriniCLI(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    caretaker = Caretaker(santorini)
+    caretaker.backup() # save initial state of board
+    santorini.run(caretaker)

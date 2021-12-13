@@ -1,6 +1,7 @@
 import sys
 from board import Board
 from player import playerFactory
+from memento import Memento
 
 class SantoriniCLI:
     """Display board and options"""
@@ -18,7 +19,7 @@ class SantoriniCLI:
         self._redo = True if arg3 == "on" else False
         self._score = True if arg4 == "off" else False
     
-    def run(self):
+    def run(self, caretaker):
         while True:
             # display
             self.board.display()
@@ -37,9 +38,26 @@ class SantoriniCLI:
 
             print("\n")
 
+            # undo, redo, or next
+            if self._redo:
+                undo_redo = input("undo, redo, or next\n")
+                if undo_redo == "undo":
+                    # undo
+                    caretaker.undo()
+                    continue
+                elif undo_redo == "redo":
+                    # redo
+                    caretaker.redo()
+                    continue
+                elif undo_redo == "next":
+                    caretaker.wipe()
+
             # move
             move = self._currPlayer.choose_move()
             move.execute()
+
+            # save the board after every move
+            caretaker.backup()
 
             # check if game ended
             if self._board.game_ended():
@@ -52,7 +70,19 @@ class SantoriniCLI:
             else:
                 self._currPlayer = self.board.player1
                 self._otherPlayer = self.board.player2
-            
+
+    def save(self):
+        """
+        Saves the current state inside a memento.
+        """
+        state = (self._board, self._currPlayer, self._otherPlayer, self._turn)
+        return Memento(state)
+
+    def restore(self, memento):
+        """
+        Restores the Originator's state from a memento object.
+        """
+        (self._board, self._currPlayer, self._otherPlayer, self._turn) = memento.get_state()
             
             
         
