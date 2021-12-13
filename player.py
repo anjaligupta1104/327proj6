@@ -4,6 +4,8 @@ CPSC 327 Pset
 Sunday, 10:20 pm
 """
 
+import random
+
 from board import Board
 from move import Move
 class playerFactory:
@@ -68,7 +70,11 @@ class Player:
                 for build_num in range(9):
                     move = directions[move_num]
                     build = directions[build_num]
-                    moves.append([piece_num,move,build])
+                    
+                    potential_move = [piece_num, move, build]
+                    if self._valid(potential_move):
+                        moves.append(potential_move)
+        return moves
 
 class WorkerError(Exception):
     pass
@@ -138,10 +144,13 @@ class Human(Player):
             else:
                 break
 
-        return Move(piece_num,move,build)
+        return [piece_num,move,build]
 class Random(Player):
     def choose_move(self):
-        for piece in 
+        moves = self.enumerate_valid_moves()
+        random_i = random.randint(0,len(moves)-1)
+        potential_move = moves[random_i]
+        return potential_move
 class Heuristic(Player):
     def __init__(self):
         self.height_score = 0
@@ -149,13 +158,36 @@ class Heuristic(Player):
         self.distance_score = 0
     
     def height_score(self, board):
-        self.height_score = board.buildings[self._piece1[i]]
-        piece2_score = board.buildings[]
+        piece1_height = board.buildings[self._piece1[0]][self._piece1[1]]
+        piece2_height = board.buildings[self._piece2[0]][self._piece2[1]]
+        return piece1_height + piece2_height
 
     def center_score(self, board):
+        piece1_center = board.buildings[self._piece1[0]]
+        return 1
 
     def distance_score(self, board):
+        return 1
 
-    def move(self):
-        while True:
+    def choose_move(self):
+        moves = self.enumerate_valid_moves()
+        
+        # weights
+        c1 = 3
+        c2 = 2
+        c3 = 1
+
+        # max scores
+        max_height_score = 0
+        max_center_score = 0
+        max_distance_score = 0
+        max_move_score = 0
+
+        # iterate through all moves
+        for potential_move in moves:
+            my_board = Board()
+            move_score = c1*self.height_score(potential_move) + c2*self.center_score(potential_move) + c3*self.distance_score(poten)
+            move_scores.append(move_score)
+
+        
             
