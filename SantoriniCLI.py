@@ -76,7 +76,7 @@ class SantoriniCLI:
                 self._otherPlayer = self._player1
             else:
                 self._currPlayer = self._player1
-<<<<<<< HEAD
+                self._otherPlayer = self._player2
 
     def save(self) -> Memento:
         """
@@ -91,10 +91,6 @@ class SantoriniCLI:
         """
         # TODO: change restore function
         self._state = memento.get_state()
-=======
-                self._otherPlayer = self._player2
->>>>>>> 6fcbb1a0c83921967d6d3fdcc85e0443ced408e2
-            
             
             
         
