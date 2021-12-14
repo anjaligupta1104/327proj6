@@ -1,4 +1,3 @@
-import sys
 import random
 from move import Move
 from piece import Piece
@@ -30,17 +29,11 @@ class Player:
         self.piece2 = Piece(player_num, 2)
         self._type = player_type
 
-        self._temp_location = None # used for try_move
+        self._temp_location = None
+        self._temp_workers = None
     
     def choose_move(self):
         pass
-
-    def no_moves_exit(self, player_num):
-        if (player_num == 1):
-            print("blue has won")
-        else:
-            print("white has won")
-        sys.exit(0)
 
     def copy(self, board_copy, player_num):
         player_copy = playerFactory.build_player(board_copy, self._type, 1)
@@ -160,10 +153,6 @@ class Human(Player):
         super().__init__(board, player_num, player_type)
 
     def choose_move(self):
-        moves = self._enumerate_valid_moves()
-        # if not moves:
-        #     self.no_moves_exit(self.player_num)
-
         while True:
             try:
                 piece_letter = input("Select a worker to move\n")
@@ -225,8 +214,6 @@ class Random(Player):
 
     def choose_move(self):
         moves = self._enumerate_valid_moves()
-        if not moves:
-            self.no_moves_exit(self.player_num)
 
         random_i = random.randint(0,len(moves)-1)
         move = moves[random_i]
@@ -242,8 +229,6 @@ class Heuristic(Player):
 
     def choose_move(self):
         moves = self._enumerate_valid_moves()
-        if not moves:
-            self.no_moves_exit(self.player_num)
 
         max_move_score = 0
         max_move = None

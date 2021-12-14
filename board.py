@@ -35,6 +35,16 @@ class Board:
         print("+--+--+--+--+--+")
 
     def game_ended(self):
+        moves = self.player1._enumerate_valid_moves()
+        if not moves:
+            print("blue has won")
+            return True
+
+        moves = self.player2._enumerate_valid_moves()
+        if not moves:
+            print("white has won")
+            return True
+
         for i in range(5):
             for j in range(5):
                 if self.buildings[i][j] == 3 and self.workers[i][j] != 0:
