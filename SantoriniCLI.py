@@ -31,11 +31,13 @@ class SantoriniCLI:
                 playerLabel = "blue (YZ)"
 
             print("Turn: {0}, {1}".format(self._turn, playerLabel), end = '')
-    
+
             # print score, note that this only occurs if currPlayer is heuristic
             if self._score:
                 (move_score, height_score, center_score, distance_score) = self._currPlayer._move_score()
                 print(", ({0}, {1}, {2})".format(height_score, center_score, distance_score))
+            else:
+                print("")
 
             # check if game ended
             if self.board.game_ended():
@@ -58,32 +60,35 @@ class SantoriniCLI:
 
             # move
             move = self._currPlayer.choose_move()
+            self._turn += 1
             move.execute()
 
             # save the board after every move
             caretaker.backup()
 
             # switch players
-            if self._turn % 2 == 1:
+            if self._turn % 2 == 0:
                 self._currPlayer = self.board.player2
                 self._otherPlayer = self.board.player1
             else:
                 self._currPlayer = self.board.player1
                 self._otherPlayer = self.board.player2
-            self._turn += 1
 
     def save(self):
         """
         Saves the current state inside a memento.
         """
-        state = (self.board, self._currPlayer, self._otherPlayer, self._turn)
+        board = self.board.copy()
+        state = (board, self._turn)
         return Memento(state)
 
     def restore(self, memento):
         """
         Restores the Originator's state from a memento object.
         """
-        (self.board, self._currPlayer, self._otherPlayer, self._turn) = memento.get_state()
+        (self.board, self._turn) = memento.get_state()
+        self._currPlayer = self.board.player1
+        self._otherPlayer = self.board.player2
             
             
         

@@ -25,3 +25,11 @@ class Piece:
         """ Updates location index of piece object with delta x and delta y. """
         self.location[0] = self.location[0] + x
         self.location[1] = self.location[1] + y
+
+    def copy(self, player_num, piece_num):
+        piece_copy = Piece(player_num, piece_num)
+        piece_copy.name = self.name
+        piece_copy.location = [0,0]
+        piece_copy.location[0] = self.location[0]
+        piece_copy.location[1] = self.location[1]
+        return piece_copy

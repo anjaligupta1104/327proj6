@@ -22,16 +22,25 @@ class playerFactory:
             return Heuristic(board, player_num)
 
 class Player:
-    def __init__(self, board, player_num):
+    def __init__(self, board, player_num, player_type):
         self.board = board
         self.player_num = player_num
         self.piece1 = Piece(player_num, 1)
         self.piece2 = Piece(player_num, 2)
+        self._type = player_type
 
         self._temp_location = None # used for try_move
     
     def choose_move(self):
         pass
+
+    def copy(self, board_copy, player_num):
+        player_copy = playerFactory.build_player(board_copy, self._type, 1)
+        player_copy.board = board_copy
+        player_copy.player_num = player_num
+        player_copy.piece1 = self.piece1.copy(player_num, 1) 
+        player_copy.piece2 = self.piece2.copy(player_num, 2)
+        return player_copy
 
     def _enumerate_valid_moves(self):
         moves = []
@@ -136,8 +145,8 @@ class Player:
         return (move_score, height_score, center_score, distance_score)
 
 class Human(Player):
-    def __init__(self, board, player_num):
-        super().__init__(board, player_num)
+    def __init__(self, board, player_num, player_type = "human"):
+        super().__init__(board, player_num, player_type)
 
     def choose_move(self):
         while True:
@@ -196,8 +205,8 @@ class Human(Player):
         return Move(self.board, self.player_num, piece_num, move_dir, build_dir)
 
 class Random(Player):
-    def __init__(self, board, player_num):
-        super().__init__(board, player_num)
+    def __init__(self, board, player_num, player_type = "random"):
+        super().__init__(board, player_num, player_type)
 
     def choose_move(self):
         moves = self._enumerate_valid_moves()
@@ -207,8 +216,8 @@ class Random(Player):
         return move
 
 class Heuristic(Player):
-    def __init__(self, board, player_num):
-        super().__init__(board, player_num)
+    def __init__(self, board, player_num, player_type = "heuristic"):
+        super().__init__(board, player_num, player_type)
         self.height_score = 0
         self.center_score = 0
         self.distance_score = 0

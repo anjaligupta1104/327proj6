@@ -47,4 +47,21 @@ class Board:
                     return True
 
         return False
+
+    def copy(self):
+        board_copy = Board()
+        board_copy.buildings = self._copy_array(self.buildings)
+        board_copy.workers = self._copy_array(self.workers)
+        board_copy.player1 = self.player1.copy(board_copy, 1)
+        board_copy.player2 = self.player2.copy(board_copy, 2)
+        return board_copy
+
+    def _copy_array(self, array):
+        array_copy = [[0 for col in range(5)] for row in range(5)]
+        for i in range(5):
+            for j in range(5):
+                array_copy[i][j] = array[i][j]
+
+        return array_copy
+                
         

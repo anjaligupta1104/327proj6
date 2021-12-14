@@ -7,10 +7,12 @@ SantoriniCLI is the originator.
 Created classes Memento and Caretaker.
 """
 
+from board import Board
+
 class Memento:
     def __init__(self, state):
-        self._state = state # state is a tuple of (board, currPlayer, otherPlayer, turn)
-
+        self._state = state # state is a tuple of (board, turn)
+        
     def get_state(self):
         """
         The Originator uses this method when restoring its state.
