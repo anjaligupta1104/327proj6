@@ -54,6 +54,7 @@ class SantoriniCLI:
                     continue
                 elif undo_redo == "next":
                     caretaker.wipe()
+                    caretaker.incrementPointer()
 
             # move
             move = self._currPlayer.choose_move()

@@ -46,7 +46,7 @@ class Caretaker():
 
     def redo(self) -> None:
         # do nothing if already at latest turn
-        if (self._pointer == (len(self._mementos - 1))):
+        if (self._pointer == (len(self._mementos) - 1)):
             return
 
         self._pointer += 1 # increment pointer by 1
@@ -60,3 +60,6 @@ class Caretaker():
         # new turn has been taken, invalidate any turns that could have been redone
         while((len(self._mementos) - 1) > self._pointer):
             self._mementos.pop()
+
+    def incrementPointer(self):
+        self._pointer += 1
