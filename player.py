@@ -161,8 +161,8 @@ class Human(Player):
 
     def choose_move(self):
         moves = self._enumerate_valid_moves()
-        # if not moves:
-        #     self.no_moves_exit(self.player_num)
+        if not moves:
+            self.no_moves_exit(self.player_num)
 
         while True:
             try:
@@ -253,6 +253,9 @@ class Heuristic(Player):
             move.execute()
 
             (move_score, height_score, center_score, distance_score) = self._move_score()
+
+            if move.moved_to_3():
+                move_score = float('inf')
             
             if move_score > max_move_score:
                 max_move = move
