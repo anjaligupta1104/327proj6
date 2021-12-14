@@ -120,13 +120,13 @@ class Player:
         otherPlayer = self.board.player2 if self.player_num == 1 else self.board.player1 
         distance_other1 = min(self._distance_helper(self.piece1, otherPlayer.piece1), self._distance_helper(self.piece2, otherPlayer.piece1))
         distance_other2 = min(self._distance_helper(self.piece1, otherPlayer.piece2), self._distance_helper(self.piece2, otherPlayer.piece2))
-        return distance_other1 + distance_other2
+        return 8 - (distance_other1 + distance_other2)
         
     def _distance_helper(self, piece1, piece2):
         distance_x = abs(piece1.location[0] - piece2.location[0])
         distance_y = abs(piece1.location[1] - piece2.location[1])
 
-        return distance_x + distance_y
+        return abs(distance_x - distance_y) + min(distance_x,distance_y)
 
     def _move_score(self):
         height_score = self._height_score()
@@ -134,7 +134,6 @@ class Player:
         distance_score = self._distance_score()
         move_score = 3*height_score + 2*center_score + 1*distance_score
         return (move_score, height_score, center_score, distance_score)
-
 
 class Human(Player):
     def __init__(self, board, player_num):
