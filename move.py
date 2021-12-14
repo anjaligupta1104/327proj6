@@ -39,16 +39,14 @@ class Move:
 
     def undo(self):
         """ Does the opposite of execute. """
-        self.print_move()
-        reverse_move = -1 * self._move
 
         # reverse piece location
         old_piece_x = self._piece.location[0]
         old_piece_y = self._piece.location[1]
-        self._piece.change_location(reverse_move[0], reverse_move[1])
+        self._piece.change_location(-1 * self._move[0], -1 * self._move[1])
 
         # reverse workers
-        self.board.workers[self._piece.location[0]][self._piece.location[1]] = 0
+        self.board.workers[old_piece_x][old_piece_y] = 0
         self.board.workers[self._piece.location[0]][self._piece.location[1]] = self._piece.name
 
         # reverse buildings

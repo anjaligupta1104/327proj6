@@ -233,6 +233,7 @@ class Heuristic(Player):
                 
             move.undo()
 
+        move.print_move()
         return max_move
             
         
