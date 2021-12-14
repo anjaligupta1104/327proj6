@@ -250,7 +250,6 @@ class Heuristic(Player):
 
         # iterate through all moves
         for move in moves:
-            move.print_move()
             move.execute()
 
             (move_score, height_score, center_score, distance_score) = self._move_score()
