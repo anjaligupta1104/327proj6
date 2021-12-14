@@ -255,13 +255,14 @@ class Heuristic(Player):
             
             if move_score > max_move_score:
                 max_move = move
+                max_move_score = move_score
                 self.height_score = height_score
                 self.center_score = center_score
                 self.distance_score = distance_score
                 
             move.undo()
 
-        move.print_move()
+        max_move.print_move()
         return max_move
             
         
