@@ -1,3 +1,4 @@
+import sys
 import random
 from move import Move
 from piece import Piece
@@ -66,9 +67,9 @@ class Player:
 
     def _set_temp(self, piece_num):
         if piece_num == 1:
-            self._temp_location = [self.piece1.location[0], self.piece1.location[0]]
+            self._temp_location = [self.piece1.location[0], self.piece1.location[1]]
         else:
-            self._temp_location = [self.piece2.location[0], self.piece2.location[0]]
+            self._temp_location = [self.piece2.location[0], self.piece2.location[1]]
         self._temp_workers = self.board._copy_array(self.board.workers)
 
     def _get_dir(self, dir):
@@ -249,6 +250,7 @@ class Heuristic(Player):
 
         # iterate through all moves
         for move in moves:
+            move.print_move()
             move.execute()
 
             (move_score, height_score, center_score, distance_score) = self._move_score()
