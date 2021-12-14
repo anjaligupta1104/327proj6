@@ -238,6 +238,9 @@ class Heuristic(Player):
             move.execute()
 
             (move_score, height_score, center_score, distance_score) = self._move_score()
+
+            if move.moved_to_3():
+                move_score = float('inf')
             
             if move_score > max_move_score:
                 max_move = move

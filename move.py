@@ -70,3 +70,6 @@ class Move:
     def print_move(self):
         """ Used for random to print piece.name, move_dir, and build_dir"""
         print(self._piece.name + "," + self._move_dir + "," + self._build_dir)
+
+    def moved_to_3(self):
+        return self.board.buildings[self._piece.location[0]][self._piece.location[1]] == 3
