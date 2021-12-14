@@ -31,6 +31,7 @@ class Player:
         self._type = player_type
 
         self._temp_location = None # used for try_move
+        
     
     def choose_move(self):
         pass
