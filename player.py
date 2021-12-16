@@ -232,6 +232,7 @@ class Heuristic(Player):
 
         max_move_score = 0
         max_move = None
+        equal_max_moves = []
 
         # iterate through all moves
         for move in moves:
@@ -244,15 +245,24 @@ class Heuristic(Player):
             
             if move_score > max_move_score:
                 max_move = move
+                equal_max_moves = []
                 max_move_score = move_score
                 self.height_score = height_score
                 self.center_score = center_score
                 self.distance_score = distance_score
+            elif move_score == max_move_score:
+                equal_max_moves.append(move) 
                 
             move.undo()
 
-        max_move.print_move()
-        return max_move
+        if equal_max_moves == []: 
+            max_move.print_move()
+            return max_move
+        else:
+            random_i = random.randint(0,len(equal_max_moves)-1)
+            move = equal_max_moves[random_i]
+            move.print_move()
+            return move
             
         
 
