@@ -38,25 +38,25 @@ class Board:
         moves = self.player1._enumerate_valid_moves()
         if not moves:
             print("blue has won")
-            return True
+            return 2
 
         moves = self.player2._enumerate_valid_moves()
         if not moves:
             print("white has won")
-            return True
+            return 1
 
         for i in range(5):
             for j in range(5):
                 if self.buildings[i][j] == 3 and self.workers[i][j] != 0:
                     if self.workers[i][j] == 'A' or self.workers[i][j] == 'B':
                         playerLabel = "white"
+                        print(playerLabel + " has won")
+                        return 1
                     else:
                         playerLabel = "blue"
-
-                    print(playerLabel + " has won")
-                    return True
-
-        return False
+                        print(playerLabel + " has won")
+                        return 2
+        return 0
 
     def copy(self):
         board_copy = Board()

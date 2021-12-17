@@ -1,3 +1,4 @@
+import sys
 from board import Board
 from player import playerFactory
 from memento import Memento
@@ -12,6 +13,9 @@ class SantoriniGUI():
         self._window = tk.Tk()
         self._window.title("Santorini")
         self._window.geometry("5000x5000")
+
+        # TODO: put in board_draw/board_display function
+        # TODO: pass in caretaker
 
         self._board_frame = tk.Frame(self._window)
         self._board_frame.grid(row=0, column=1, columnspan=5) # frame for 5x5 board grid
@@ -42,6 +46,8 @@ class SantoriniGUI():
         tk.Label(self._turn_frame, 
                 text=turn_text).grid(row=1, column=1, columnspan=2)
 
+        # call board_draw function
+
         if self._redo:
             self._undo_frame = tk.Frame(self._window)
             self._undo_frame.grid(row=2, column=1, columnspan=3) # frame for optional undo/redo/next buttons
@@ -66,59 +72,66 @@ class SantoriniGUI():
             tk.Label(self._score_frame, 
                     text=score_text).grid(row=1, column=1)
 
+        ended = self.board.game_ended()
+        if ended:
+            if (ended == 1):
+                winner = "White"
+            if (ended == 2):
+                winner = "Blue"
+            messagebox.showinfo(message=f"{winner} has won!")
+            sys.exit(0)
+
         self._window.mainloop()
+
+    def move(self, i, j):
+        # function called every time a buttton on 5x5 grid is clicked
+        # MEILI: attach this to the grid buttons
+        # TODO: highlight legal moves
+        # show warning if not legal move and return
+        # otherwise
+        move = self._currPlayer.choose_move()
+        self._turn += 1
+        move.execute()
+        caretaker.backup()
+
+        if self._turn % 2 == 0:
+            self._currPlayer = self.board.player2
+            self._otherPlayer = self.board.player1
+        else:
+            self._currPlayer = self.board.player1
+            self._otherPlayer = self.board.player2
+
+        # redraw board
     
-    # def run(self, caretaker):
-    #     while True:
-    #         # check if game ended
-    #         if self.board.game_ended():
-    #             sys.exit(0)
+    def _next_move(self):
+        # TODO: implement function
+        caretaker.wipe()
+        caretaker.incrementPointer()
+        # redraw board
 
-    #         # undo, redo, or next
-    #         if self._redo:
-    #             undo_redo = input("undo, redo, or next\n")
-    #             if undo_redo == "undo":
-    #                 # undo
-    #                 caretaker.undo()
-    #                 continue
-    #             elif undo_redo == "redo":
-    #                 # redo
-    #                 caretaker.redo()
-    #                 continue
-    #             elif undo_redo == "next":
-    #                 caretaker.wipe()
-    #                 caretaker.incrementPointer()
+    def _undo_move(self):
+        # TODO: implement function
+        caretaker.undo()
+        # redraw board
 
-    #         # move
-    #         move = self._currPlayer.choose_move()
-    #         self._turn += 1
-    #         move.execute()
-
-    #         # save the board after every move
-    #         caretaker.backup()
-
-    #         # switch players
-    #         if self._turn % 2 == 0:
-    #             self._currPlayer = self.board.player2
-    #             self._otherPlayer = self.board.player1
-    #         else:
-    #             self._currPlayer = self.board.player1
-    #             self._otherPlayer = self.board.player2
-
+    def _redo_move(self):
+        # TODO: implement function
+        caretaker.redo()
+        # redraw board
 
 # TOOD: implement undo/redo functionality with Memento
-    # def save(self):
-    #     """
-    #     Saves the current state inside a memento.
-    #     """
-    #     board = self.board.copy()
-    #     state = (board, self._turn)
-    #     return Memento(state)
+    def save(self):
+        """
+        Saves the current state inside a memento.
+        """
+        board = self.board.copy()
+        state = (board, self._turn)
+        return Memento(state)
 
-    # def restore(self, memento):
-    #     """
-    #     Restores the Originator's state from a memento object.
-    #     """
-    #     (self.board, self._turn) = memento.get_state()
-    #     self._currPlayer = self.board.player1
-    #     self._otherPlayer = self.board.player2
+    def restore(self, memento):
+        """
+        Restores the Originator's state from a memento object.
+        """
+        (self.board, self._turn) = memento.get_state()
+        self._currPlayer = self.board.player1
+        self._otherPlayer = self.board.player2
