@@ -83,12 +83,11 @@ class SantoriniGUI():
 
         self._window.mainloop()
 
-    def _move(self, i, j):
-        # function called every time a buttton on 5x5 grid is clicked
-        # MEILI: attach this to the grid buttons
+    def _move(self, i, j): # move should only be called when currPlayer is human TODO: implement this check
         # TODO: highlight legal moves
         # show warning if not legal move and return
         # otherwise
+        
         move = self._currPlayer.choose_move()
         self._turn += 1
         move.execute()
@@ -106,7 +105,7 @@ class SantoriniGUI():
     def _display_board(self):
         for i in range(5):
             for j in range(5):
-                tk.Button(self._board_frame, height = 7, width = 7, command = self._move(), image = self.image()).grid(row=i,column=j)
+                tk.Button(self._board_frame, height = 7, width = 7, command = self._move(i,j), image = self.image()).grid(row=i,column=j)
     
     def _next_move(self):
         # TODO: implement function
