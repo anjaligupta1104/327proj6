@@ -9,13 +9,10 @@ from tkinter import messagebox
 class SantoriniGUI():
     """Display board and options"""
 
-    def __init__(self, arg1, arg2, arg3, arg4):
+    def __init__(self, arg1, arg2, arg3, arg4, caretaker):
         self._window = tk.Tk()
         self._window.title("Santorini")
         self._window.geometry("5000x5000")
-
-        # TODO: put in board_draw/board_display function
-        # TODO: pass in caretaker
 
         self._board_frame = tk.Frame(self._window)
         self._board_frame.grid(row=0, column=1, columnspan=5) # frame for 5x5 board grid
@@ -54,13 +51,13 @@ class SantoriniGUI():
 
             tk.Button(self._undo_frame, 
                     text="Next", 
-                    command=self._next_move).grid(row=1, column=1)
+                    command=self._next_move(caretaker)).grid(row=1, column=1)
             tk.Button(self._undo_frame, 
                     text="Undo", 
-                    command=self._undo_move).grid(row=1, column=2)
+                    command=self._undo_move(caretaker)).grid(row=1, column=2)
             tk.Button(self._undo_frame, 
                     text="Redo", 
-                    command=self._redo_move).grid(row=1, column=2)
+                    command=self._redo_move(caretaker)).grid(row=1, column=2)
 
         if self._score:
             self._score_frame = tk.Frame(self._window)
@@ -83,7 +80,7 @@ class SantoriniGUI():
 
         self._window.mainloop()
 
-    def move(self, i, j):
+    def move(self, i, j, caretaker):
         # function called every time a buttton on 5x5 grid is clicked
         # MEILI: attach this to the grid buttons
         # TODO: highlight legal moves
@@ -103,18 +100,18 @@ class SantoriniGUI():
 
         # redraw board
     
-    def _next_move(self):
+    def _next_move(self, caretaker):
         # TODO: implement function
         caretaker.wipe()
         caretaker.incrementPointer()
         # redraw board
 
-    def _undo_move(self):
+    def _undo_move(self, caretaker):
         # TODO: implement function
         caretaker.undo()
         # redraw board
 
-    def _redo_move(self):
+    def _redo_move(self, caretaker):
         # TODO: implement function
         caretaker.redo()
         # redraw board
