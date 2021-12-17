@@ -15,4 +15,4 @@ if __name__ == "__main__":
     santorini = SantoriniCLI(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     caretaker = Caretaker(santorini)
     caretaker.backup() # save initial state of board
-    santorini(caretaker)
+    santorini.run(caretaker)
