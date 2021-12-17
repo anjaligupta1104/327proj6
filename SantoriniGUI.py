@@ -1,7 +1,7 @@
 import sys
 from board import Board
 from player import playerFactory
-from memento import Memento
+from memento import Caretaker, Memento
 
 import tkinter as tk
 from tkinter import messagebox
@@ -23,6 +23,10 @@ class SantoriniGUI():
         self._turn_frame = tk.Frame(self._window)
         self._turn_frame.grid(row=1, column=1, columnspan=2)
 
+        # frame for optional score display
+        self._score_frame = tk.Frame(self._window)
+        self._score_frame.grid(row=3, column=1) 
+
         self.board = Board()
         player1 = playerFactory.build_player(self.board, arg1, 1)
         player2 = playerFactory.build_player(self.board, arg2, 2)
@@ -34,17 +38,6 @@ class SantoriniGUI():
         self._turn = 1
         self._redo = True if arg3 == "on" else False
         self._score = True if arg4 == "on" else False
-
-        if self._turn % 2 == 1:
-            playerLabel = "white (AB)"
-        else:
-            playerLabel = "blue (YZ)"
-
-        turn_text = f"Turn: {self._turn}, {playerLabel}"
-        tk.Label(self._turn_frame, 
-                text=turn_text).grid(row=1, column=1, columnspan=2)
-
-        self._display_board()
 
         if self._redo:
             self._undo_frame = tk.Frame(self._window)
@@ -60,15 +53,7 @@ class SantoriniGUI():
                     text="Redo", 
                     command=self._redo_move(caretaker)).grid(row=1, column=2)
 
-        if self._score:
-            self._score_frame = tk.Frame(self._window)
-            self._score_frame.grid(row=3, column=1) # frame for optional score display
-
-            (move_score, height_score, center_score, distance_score) = self._currPlayer._move_score()
-            score_text = f"{height_score}, {center_score}, {distance_score}"
-
-            tk.Label(self._score_frame, 
-                    text=score_text).grid(row=1, column=1)
+        self._display_board()
 
         ended = self.board.game_ended()
         if ended:
@@ -81,7 +66,7 @@ class SantoriniGUI():
 
         self._window.mainloop()
 
-    def move(self, i, j, caretaker):
+    def _move(self, i, j, caretaker):
         # function called every time a buttton on 5x5 grid is clicked
         # move should only be called when currPlayer is human TODO: implement this check
         # TODO: highlight legal moves
@@ -100,30 +85,62 @@ class SantoriniGUI():
             self._currPlayer = self.board.player1
             self._otherPlayer = self.board.player2
 
-        # redraw board
+        self._display_board(caretaker)
 
-    def _display_board(self):
+    def _image(self, i, j):
+        level = self.board.buildings[i][j]
+        worker = self.board.workers[i][j]
+        tower_img = f"level{level}.png"
+        stacked_img = tower_img
+
+        if (worker == 'Y' or worker == 'Z'):
+            player_img = "blue.png"
+        elif (worker == 'A' or worker == 'B'):
+            player_img = "white.png"
+
+        return stacked_img
+
+    def _display_board(self, caretaker):
+        for x in self._turn_frame.winfo_children():
+            x.destroy()
+        for x in self._score_frame.winfo_children():
+            x.destroy()
+        for x in self._board_frame.winfo_children():
+            x.destroy()
+
+        if self._turn % 2 == 1:
+            playerLabel = "white (AB)"
+        else:
+            playerLabel = "blue (YZ)"
+
+        turn_text = f"Turn: {self._turn}, {playerLabel}"
+        tk.Label(self._turn_frame, 
+                text=turn_text).grid(row=1, column=1, columnspan=2)
+
         for i in range(5):
             for j in range(5):
-                tk.Button(self._board_frame, height = 7, width = 7, command = self._move(i,j), image = self.image()).grid(row=i,column=j)
+                tk.Button(self._board_frame, height = 7, width = 7, command = self._move(i,j, caretaker), image = self._image(i, j)).grid(row=i,column=j)
     
+        if self._score:
+            (move_score, height_score, center_score, distance_score) = self._currPlayer._move_score()
+            score_text = f"{height_score}, {center_score}, {distance_score}"
+
+            tk.Label(self._score_frame, 
+                    text=score_text).grid(row=1, column=1)
+
     def _next_move(self, caretaker):
-        # TODO: implement function
         caretaker.wipe()
         caretaker.incrementPointer()
-        # redraw board
+        self._display_board(caretaker)
 
     def _undo_move(self, caretaker):
-        # TODO: implement function
         caretaker.undo()
-        # redraw board
+        self._display_board(caretaker)
 
     def _redo_move(self, caretaker):
-        # TODO: implement function
         caretaker.redo()
-        # redraw board
+        self._display_board(caretaker)
 
-    # TOOD: implement undo/redo functionality with Memento
     def save(self):
         """
         Saves the current state inside a memento.
