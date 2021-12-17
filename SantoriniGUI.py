@@ -12,16 +12,18 @@ class SantoriniGUI():
     def __init__(self, arg1, arg2, arg3, arg4):
         self._window = tk.Tk()
         self._window.title("Santorini")
-        self._window.geometry("5000x5000")
+        self._window.geometry("550x800")
+        self._window.config(bg="skyblue")
 
-        # TODO: put in board_draw/board_display function
         # TODO: pass in caretaker
 
-        self._board_frame = tk.Frame(self._window)
-        self._board_frame.grid(row=0, column=1, columnspan=5) # frame for 5x5 board grid
+        # frame for 5x5 board grid
+        self._board_frame = tk.Frame(self._window, width = 500, height = 500)
+        self._board_frame.grid(row=0, column=0, columnspan=5, padx=25, pady=25)
 
+        # frame for turn and player 
         self._turn_frame = tk.Frame(self._window)
-        self._turn_frame.grid(row=1, column=1, columnspan=2) # frame for turn and player
+        self._turn_frame.grid(row=1, column=1, columnspan=2)
 
         self.board = Board()
         player1 = playerFactory.build_player(self.board, arg1, 1)
@@ -35,8 +37,6 @@ class SantoriniGUI():
         self._redo = True if arg3 == "on" else False
         self._score = True if arg4 == "on" else False
 
-        # TODO: implement grid buttons for clicking and add workers
-
         if self._turn % 2 == 1:
             playerLabel = "white (AB)"
         else:
@@ -46,7 +46,7 @@ class SantoriniGUI():
         tk.Label(self._turn_frame, 
                 text=turn_text).grid(row=1, column=1, columnspan=2)
 
-        # call board_draw function
+        self._display_board()
 
         if self._redo:
             self._undo_frame = tk.Frame(self._window)
@@ -83,7 +83,7 @@ class SantoriniGUI():
 
         self._window.mainloop()
 
-    def move(self, i, j):
+    def _move(self, i, j):
         # function called every time a buttton on 5x5 grid is clicked
         # MEILI: attach this to the grid buttons
         # TODO: highlight legal moves
@@ -102,6 +102,11 @@ class SantoriniGUI():
             self._otherPlayer = self.board.player2
 
         # redraw board
+
+    def _display_board(self):
+        for i in range(5):
+            for j in range(5):
+                tk.Button(self._board_frame, height = 7, width = 7, command = self._move(), image = self.image()).grid(row=i,column=j)
     
     def _next_move(self):
         # TODO: implement function
@@ -119,7 +124,7 @@ class SantoriniGUI():
         caretaker.redo()
         # redraw board
 
-# TOOD: implement undo/redo functionality with Memento
+    # TOOD: implement undo/redo functionality with Memento
     def save(self):
         """
         Saves the current state inside a memento.
