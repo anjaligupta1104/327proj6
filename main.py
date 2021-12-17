@@ -4,7 +4,7 @@ CPSC 327 Pset 6
 """
 
 import sys
-from SantoriniCLI import SantoriniCLI
+from SantoriniCLI_noGUI import SantoriniCLI
 from memento import Caretaker
 
 """

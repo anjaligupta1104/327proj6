@@ -1,7 +1,4 @@
-# version of SantoriniGUI with SantoriniGUI inheriting from SantoriniCLI
-
 import sys
-from SantoriniCLI_noGUI import SantoriniCLI
 from board import Board
 from player import playerFactory
 from memento import Caretaker, Memento
@@ -9,10 +6,11 @@ from memento import Caretaker, Memento
 import tkinter as tk
 from tkinter import messagebox
 
-class SantoriniGUI(SantoriniCLI):
+class SantoriniGUI():
     """Display board and options"""
 
-    def __init__(self, caretaker):
+    def __init__(self, arg1, arg2, arg3, arg4, caretaker):
+        super().__init__()
         self._window = tk.Tk()
         self._window.title("Santorini")
         self._window.geometry("550x800")
@@ -29,6 +27,18 @@ class SantoriniGUI(SantoriniCLI):
         # frame for optional score display
         self._score_frame = tk.Frame(self._window)
         self._score_frame.grid(row=3, column=1) 
+
+        self.board = Board()
+        player1 = playerFactory.build_player(self.board, arg1, 1)
+        player2 = playerFactory.build_player(self.board, arg2, 2)
+        self.board.set_player(player1)
+        self.board.set_player(player2)
+
+        self._currPlayer = player1
+        self._otherPlayer = player2
+        self._turn = 1
+        self._redo = True if arg3 == "on" else False
+        self._score = True if arg4 == "on" else False
 
         if self._redo:
             self._undo_frame = tk.Frame(self._window)
@@ -132,3 +142,19 @@ class SantoriniGUI(SantoriniCLI):
     def _redo_move(self, caretaker):
         caretaker.redo()
         self._display_board(caretaker)
+
+    def save(self):
+        """
+        Saves the current state inside a memento.
+        """
+        board = self.board.copy()
+        state = (board, self._turn)
+        return Memento(state)
+
+    def restore(self, memento):
+        """
+        Restores the Originator's state from a memento object.
+        """
+        (self.board, self._turn) = memento.get_state()
+        self._currPlayer = self.board.player1
+        self._otherPlayer = self.board.player2

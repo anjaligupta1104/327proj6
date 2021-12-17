@@ -4,8 +4,8 @@ CPSC 327 Pset 6
 """
 
 import sys
-from SantoriniGUI import SantoriniGUI
-from SantoriniCLI import SantoriniCLI
+from SantoriniGUIOld import SantoriniGUI
+from SantoriniCLI_noGUI import SantoriniCLI
 from memento import Caretaker
 
 if __name__ == "__main__":
