@@ -2,7 +2,7 @@ import sys
 from board import Board
 from player import playerFactory
 from memento import Memento
-from SantoriniGUI import SantoriniGUI
+from SantoriniGUIundo import SantoriniGUI
 
 class SantoriniCLI:
     """Display board and options"""

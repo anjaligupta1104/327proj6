@@ -5,15 +5,15 @@ from SantoriniCLI_noGUI import SantoriniCLI
 from board import Board
 from player import playerFactory
 from memento import Caretaker, Memento
-from PIL import ImageTk
+from tkinter.constants import ACTIVE, DISABLED
 
 import tkinter as tk
 from tkinter import messagebox
 
-class SantoriniGUI():
+class SantoriniGUI(SantoriniCLI):
     """Display board and options"""
 
-    def __init__(self, arg1, arg2, arg3, arg4):
+    def __init__(self, caretaker):
         self._window = tk.Tk()
         self._window.title("Santorini")
         self._window.geometry("550x800")
@@ -31,26 +31,15 @@ class SantoriniGUI():
         self._score_frame = tk.Frame(self._window)
         self._score_frame.grid(row=3, column=1) 
 
-        self.board = Board()
-        player1 = playerFactory.build_player(self.board, arg1, 1)
-        player2 = playerFactory.build_player(self.board, arg2, 2)
-        self.board.set_player(player1)
-        self.board.set_player(player2)
-
-        self._currPlayer = player1
-        self._otherPlayer = player2
-        self._turn = 1
-        self._redo = True if arg3 == "on" else False
-        self._score = True if arg4 == "on" else False
-
         # choose and execute move
-        if (self._currPlayer._type == "human"):
+        if (self._currPlayer.type == "human"):
             self._choose_worker()
         else:
             move = self._currPlayer.choose_move()
             move.execute()
         self._display_board()
 
+        caretaker.backup()
         self._turn += 1
         if self._turn % 2 == 0:
             self._currPlayer = self.board.player2
@@ -65,13 +54,13 @@ class SantoriniGUI():
 
             tk.Button(self._undo_frame, 
                     text="Next", 
-                    command=self._next_move()).grid(row=1, column=1)
+                    command=self._next_move(caretaker)).grid(row=1, column=1)
             tk.Button(self._undo_frame, 
                     text="Undo", 
-                    command=self._undo_move()).grid(row=1, column=2)
+                    command=self._undo_move(caretaker)).grid(row=1, column=2)
             tk.Button(self._undo_frame, 
                     text="Redo", 
-                    command=self._redo_move()).grid(row=1, column=2)
+                    command=self._redo_move(caretaker)).grid(row=1, column=2)
 
         ended = self.board.game_ended()
         if ended:
@@ -96,15 +85,9 @@ class SantoriniGUI():
             worker = ""
 
         img_name = f"{worker}level{level}.jpg"
+        return img_name
 
-        # im = Image.open(img_name)
-        print(i, j)
-        print(img_name)
-        ph = ImageTk.PhotoImage(file = img_name)
-        print("worked!")
-        return ph
-
-    def _display_board(self):
+    def _display_board(self, caretaker):
         for x in self._turn_frame.winfo_children():
             x.destroy()
         for x in self._score_frame.winfo_children():
@@ -152,15 +135,15 @@ class SantoriniGUI():
         buttons = [[None for col in range(5)] for row in range(5)]
         for i in range(5):
             for j in range(5):
-                button = tk.Button(self._board_frame, height = 7, width = 7, command = self._choose_move(i,j), image = self._image(i,j), state = tk.DISABLED, bg = "white")
+                button = tk.Button(self._board_frame, height = 7, width = 7, command = self._choose_move(i,j), image = self._image(i,j), state = DISABLED, bg = "white")
                 buttons[i][j] = button
 
         # enable buttons at piece locations if legal, end game if no legal pieces
         if self._legal_worker(1):
-            buttons[piece1[0]][piece1[1]]["state"] = tk.NORMAL
+            buttons[piece1[0]][piece1[1]]["state"] = ACTIVE
             buttons[piece1[0]][piece1[1]]["bg"] = "red"
         elif self._legal_worker(2):
-            buttons[piece2[0]][piece2[1]]["state"] = tk.NORMAL
+            buttons[piece2[0]][piece2[1]]["state"] = ACTIVE
             buttons[piece1[0]][piece1[1]]["bg"] = "red"
         else: # no legal moves, game ended
             winner = "White" if self._currPlayer.player_num == 1 else "Blue"
@@ -198,8 +181,8 @@ class SantoriniGUI():
             height_diff = self.board.buildings[new_x][new_y] - self.board.buildings[i][j] <= 1
 
             if free and height_diff:
-                self._currPlayer._temp_workers[i][j] = 0
-                self._currPlayer._temp_location = [new_x, new_y]
+                self._temp_workers[i][j] = 0
+                self._temp_location = [new_x, new_y]
                 return True
             else:
                 return False
@@ -212,7 +195,7 @@ class SantoriniGUI():
         buttons = [[None for col in range(5)] for row in range(5)]
         for i in range(5):
             for j in range(5):
-                button = tk.Button(self._board_frame, height = 7, width = 7, command = self._choose_build(piece_x, piece_y, i,j), image = self._image(i, j), state = tk.DISABLED, bg = "white")
+                button = tk.Button(self._board_frame, height = 7, width = 7, command = self._choose_build(piece_x, piece_y, i,j), image = self._image(), state = DISABLED, bg = "white")
                 buttons[i][j] = button
 
         # enable buttons that represent legal moves
@@ -222,7 +205,7 @@ class SantoriniGUI():
                 move = self._get_dir(dir)
                 move_x = i + move[0]
                 move_y = j + move[1]
-                buttons[move_x][move_y]["state"] = tk.NORMAL
+                buttons[move_x][move_y]["state"] = ACTIVE
                 buttons[move_x][move_y]["bg"] = "orange"
 
         # redraw board
@@ -251,8 +234,7 @@ class SantoriniGUI():
     def _choose_build(self, piece_x, piece_y, new_x, new_y):
         """Displays the board with only valid builds from i,j enabled."""
         # update piece location
-        piece = self._currPlayer.piece1 if self.board.workers[piece_x][piece_y] in {'A', 'Y'} else self._currPlayer.piece2
-        piece_num = 1 if self.board.workers[piece_x][piece_y] in {'A', 'Y'} else 2
+        piece = self._currPlayer.piece1 if self.board.workers[piece_x, piece_y] in {'A', 'Y'} else self._currPlayer.piece2
         piece.location = [new_x,new_y]
         # update workers
         self.board.workers[piece_x][piece_y] = 0
@@ -262,18 +244,17 @@ class SantoriniGUI():
         buttons = [[None for col in range(5)] for row in range(5)]
         for i in range(5):
             for j in range(5):
-                button = tk.Button(self._board_frame, height = 7, width = 7, command = self._build(i,j), image = self._image(i,j), state = tk.DISABLED, bg = "white")
+                button = tk.Button(self._board_frame, height = 7, width = 7, command = self._build(i,j), image = self._image(), state = DISABLED, bg = "white")
                 buttons[i][j] = button
 
         # enable buttons that represent legal moves
         directions = ["n", "ne", "e", "se", "s", "sw", "w", "nw"]
         for move_num in range(8):
-            self._currPlayer._set_temp(piece_num)
             if self._legal_move(i,j,directions[move_num]):
-                move = self._get_dir(directions[move_num])
+                move = self._get_dir(dir)
                 move_x = i + move[0]
                 move_y = j + move[1]
-                buttons[move_x][move_y]["state"] = tk.NORMAL
+                buttons[move_x][move_y]["state"] = ACTIVE
                 buttons[move_x][move_y]["bg"] = "orange"
 
         # redraw board
@@ -285,18 +266,18 @@ class SantoriniGUI():
         """Displays the board at end of each turn."""
         for i in range(5):
             for j in range(5):
-                button = tk.Button(self._board_frame, height = 7, width = 7, image = self._image(i, j))
+                button = tk.Button(self._board_frame, height = 7, width = 7, image = self._image())
                 button.grid(row=i,column=j)
 
-    def _next_move(self):
-        # caretaker.wipe()
-        # caretaker.incrementPointer()
-        self._display_board()
+    def _next_move(self, caretaker):
+        caretaker.wipe()
+        caretaker.incrementPointer()
+        self._display_board(caretaker)
 
-    def _undo_move(self):
-        # caretaker.undo()
-        self._display_board()
+    def _undo_move(self, caretaker):
+        caretaker.undo()
+        self._display_board(caretaker)
 
-    def _redo_move(self):
-        # caretaker.redo()
-        self._display_board()
+    def _redo_move(self, caretaker):
+        caretaker.redo()
+        self._display_board(caretaker)
