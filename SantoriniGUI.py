@@ -90,15 +90,16 @@ class SantoriniGUI():
     def _image(self, i, j):
         level = self.board.buildings[i][j]
         worker = self.board.workers[i][j]
-        tower_img = f"level{level}.png"
-        stacked_img = tower_img
 
         if (worker == 'Y' or worker == 'Z'):
-            player_img = "blue.png"
+            worker = "blue"
         elif (worker == 'A' or worker == 'B'):
-            player_img = "white.png"
+            worker = "white"
+        else:
+            worker = ""
 
-        return stacked_img
+        img_name = f"{worker}level{level}.jpg"
+        return img_name
 
     def _display_board(self, caretaker):
         for x in self._turn_frame.winfo_children():
